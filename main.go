@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	docs "influxer/hattrick/docs"
-	hattrick "influxer/hattrick/routes"
+	filesystem "influxer/hattrick/routes/files"
+	hattrick "influxer/hattrick/routes/hattrick"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -44,6 +45,10 @@ func main() {
 		hg := v1.Group("/hattrick")
 		{
 			hg.POST("/run", hattrick.Hattrick)
+		}
+		fg := v1.Group("/filesystem")
+		{
+			fg.GET("/", filesystem.GetFile)
 		}
 
 	}

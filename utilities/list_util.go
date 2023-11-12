@@ -1,4 +1,4 @@
-package list_util
+package utils
 
 func RemoveValue(slice []string, value string) []string {
 	var index int
