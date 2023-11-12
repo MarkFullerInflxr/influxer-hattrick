@@ -1,4 +1,23 @@
 basePath: /api/v1
+definitions:
+  hattrick.InitiateHattrickRequest:
+    properties:
+      school:
+        items:
+          type: string
+        type: array
+    type: object
+  hattrick.InitiateHattrickResponse:
+    properties:
+      blocked:
+        items:
+          type: string
+        type: array
+      running:
+        items:
+          type: string
+        type: array
+    type: object
 info:
   contact: {}
 paths:
@@ -17,4 +36,26 @@ paths:
       summary: ping example
       tags:
       - example
+  /hattrick/run:
+    post:
+      consumes:
+      - application/json
+      description: run hattrick
+      parameters:
+      - description: List of Schools to Run
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/hattrick.InitiateHattrickRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/hattrick.InitiateHattrickResponse'
+      summary: Run Hattrick
+      tags:
+      - hattrick
 swagger: "2.0"

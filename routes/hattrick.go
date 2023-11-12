@@ -18,6 +18,10 @@ var (
 type InitiateHattrickRequest struct {
 	School []string `json:school`
 }
+type InitiateHattrickResponse struct {
+	Blocked []string
+	Running []string
+}
 
 func markSchoolAsStarted(school string) {
 	mutex.Lock()
@@ -38,6 +42,17 @@ func runHattrick(school string) {
 	fmt.Println("Done With: " + school)
 }
 
+// @BasePath /api/v1
+// Initiate Hattrick godoc
+// @Summary Run Hattrick
+// @Schemes InitiateHattrickRequest
+// @Description run hattrick
+// @Tags hattrick
+// @Param requestBody body InitiateHattrickRequest true "List of Schools to Run"
+// @Accept json
+// @Produce json
+// @Success 200 {object} InitiateHattrickResponse
+// @Router /hattrick/run [post]
 func Hattrick(g *gin.Context) {
 	var requestData InitiateHattrickRequest
 
@@ -67,10 +82,7 @@ func Hattrick(g *gin.Context) {
 		markSchoolAsStarted(s)
 	}
 
-	returnVal := struct {
-		Blocked []string
-		Running []string
-	}{
+	returnVal := InitiateHattrickResponse{
 		Blocked: blockedSchools,
 		Running: running_schools,
 	}

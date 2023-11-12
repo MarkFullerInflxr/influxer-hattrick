@@ -27,6 +27,70 @@
                     }
                 }
             }
+        },
+        "/hattrick/run": {
+            "post": {
+                "description": "run hattrick",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hattrick"
+                ],
+                "summary": "Run Hattrick",
+                "parameters": [
+                    {
+                        "description": "List of Schools to Run",
+                        "name": "requestBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/hattrick.InitiateHattrickRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/hattrick.InitiateHattrickResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "hattrick.InitiateHattrickRequest": {
+            "type": "object",
+            "properties": {
+                "school": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "hattrick.InitiateHattrickResponse": {
+            "type": "object",
+            "properties": {
+                "blocked": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "running": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
         }
     }
 }
