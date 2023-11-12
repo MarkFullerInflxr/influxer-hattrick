@@ -23,16 +23,22 @@ type InitiateHattrickResponse struct {
 	Running []string
 }
 
-func markSchoolAsStarted(school string) {
+func tryToStartSchool(school string) bool {
 	mutex.Lock()
+	defer mutex.Unlock()
+
+	if list_util.Contains(running_schools, school) {
+		return false
+	}
+
 	running_schools = append(running_schools, school)
-	mutex.Unlock()
+	return true
 }
 
 func markSchoolAsFinished(school string) {
 	mutex.Lock()
+	defer mutex.Unlock()
 	running_schools = list_util.RemoveValue(running_schools, school)
-	mutex.Unlock()
 }
 
 func runHattrick(school string) {
@@ -61,25 +67,31 @@ func Hattrick(g *gin.Context) {
 		return
 	}
 
+	if len(requestData.School) == 0 {
+		g.JSON(http.StatusBadRequest, gin.H{"error": "No schools provided"})
+		return
+	}
+
 	fmt.Println(requestData.School, running_schools)
 
 	blockedSchools := []string{}
 	approvedSchools := []string{}
 
 	for _, s := range requestData.School {
-		if list_util.Contains(running_schools, s) {
-			blockedSchools = append(blockedSchools, s)
-		} else {
+		if tryToStartSchool(s) {
 			approvedSchools = append(approvedSchools, s)
+		} else {
+			blockedSchools = append(blockedSchools, s)
 		}
 	}
 
-	fmt.Println("Blocked:", blockedSchools)
-	fmt.Println("Allowed:", approvedSchools)
+	if len(approvedSchools) == 0 {
+		g.JSON(http.StatusBadRequest, gin.H{"error": "No schools were approved to start"})
+		return
+	}
 
 	for _, s := range approvedSchools {
 		go runHattrick(s)
-		markSchoolAsStarted(s)
 	}
 
 	returnVal := InitiateHattrickResponse{
