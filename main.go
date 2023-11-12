@@ -1,12 +1,16 @@
 package main
 
 import (
-   "github.com/gin-gonic/gin"
-   docs "github.com/influxer-hattrick/docs"
-   swaggerfiles "github.com/swaggo/files"
-   ginSwagger "github.com/swaggo/gin-swagger"
-   "net/http"
+	"fmt"
+	docs "influxer/hattrick/docs"
+	hattrick "influxer/hattrick/routes"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
 // @BasePath /api/v1
 
 // PingExample godoc
@@ -18,21 +22,33 @@ import (
 // @Produce json
 // @Success 200 {string} Helloworld
 // @Router /example/helloworld [get]
-func Helloworld(g *gin.Context)  {
-   g.JSON(http.StatusOK,"helloworld")
+func Helloworld(g *gin.Context) {
+	g.JSON(http.StatusOK, "helloworld")
 }
 
-func main()  {
-   r := gin.Default()
-   docs.SwaggerInfo.BasePath = "/api/v1"
-   v1 := r.Group("/api/v1")
-   {
-      eg := v1.Group("/example")
-      {
-         eg.GET("/helloworld",Helloworld)
-      }
-   }
-   r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-   r.Run(":8080")
+func middleware(g *gin.Context) {
+	fmt.Println("Middleware!")
+}
+
+const API_BASE string = "/api/v1"
+
+func main() {
+	r := gin.Default()
+	docs.SwaggerInfo.BasePath = API_BASE // global route base path, configure it in swagger
+	v1 := r.Group(API_BASE)              // global root base path, configure for gin
+	{
+		eg := v1.Group("/example", middleware) // begin group of api endpoints with the same base path
+		{
+			eg.GET("/helloworld", Helloworld) // configure single endpoint within group
+		}
+		hg := v1.Group("/hattrick")
+		{
+			hg.POST("/run", hattrick.Hattrick)
+		}
+
+	}
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	r.Run(":8080")
 
 }
